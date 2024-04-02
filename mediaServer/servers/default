@@ -1,0 +1,16 @@
+server {
+    listen 8080;
+
+    location / {
+        add_header Cache-Control no-cache;
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Expose-Headers' 'Content-Length';
+
+        root /opt/homebrew/var/www/stream;
+
+        types {
+            application/vnd.apple.mpegurl m3u8;
+            video/mp2t ts;
+        }
+    }
+}
