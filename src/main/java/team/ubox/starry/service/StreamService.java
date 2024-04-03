@@ -63,7 +63,7 @@ public class StreamService {
             return false;
         }
         Channel channel = optionalChannel.get();
-        Stream stream = streamRedisRepository.findById(channel.getId()).orElseThrow(() -> new IllegalStateException("존재하지 않는 방송"));
+        Stream stream = streamRedisRepository.findById(channel.getId()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_STREAM));
         System.out.println("stream.getO[p] = " + stream.getOpenTime());
         channel.updateLastStream(stream.getStreamId(), Timestamp.valueOf(stream.getOpenTime()), Timestamp.from(Instant.now()));
 
@@ -73,7 +73,7 @@ public class StreamService {
 
     public ResponseStreamDTO stream(String channelId) {
         Optional<Stream> optionalStream = streamRedisRepository.findById(UUIDUtil.stringToUUID(channelId));
-        Channel channel = channelRepository.findById(UUIDUtil.stringToUUID(channelId)).orElseThrow(() -> new IllegalStateException("잘못된 채널입니다."));
+        Channel channel = channelRepository.findById(UUIDUtil.stringToUUID(channelId)).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
 
         ResponseStreamDTO responseStreamDTO = ResponseStreamDTO.builder()
                 .channel(ChannelDTO.Response.from(channel))

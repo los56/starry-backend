@@ -8,7 +8,8 @@ CREATE TABLE users (
     email VARCHAR UNIQUE NOT NULL,
     user_role VARCHAR NOT NULL,
     create_date TIMESTAMP NOT NULL,
-    password_change_date TIMESTAMP NOT NULL
+    password_change_date TIMESTAMP NOT NULL,
+    profile_image_url VARCHAR
 );
 
 CREATE TABLE channels (
