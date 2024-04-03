@@ -47,8 +47,8 @@ CREATE TABLE community_replies (
 
 CREATE TABLE follows (
     index SERIAL PRIMARY KEY,
-    fromUser uuid NOT NULL,
-    toUser uuid NOT NULL,
-    FOREIGN KEY(fromUser) REFERENCES "users"(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY(toUser) REFERENCES "users"(id) ON DELETE CASCADE ON UPDATE CASCADE
+    from_user uuid NOT NULL,
+    to_user uuid NOT NULL,
+    FOREIGN KEY(from_user) REFERENCES "users"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(to_user) REFERENCES "users"(id) ON DELETE CASCADE ON UPDATE CASCADE
 );

@@ -1,7 +1,7 @@
 package team.ubox.starry.dto.stream;
 
 import lombok.*;
-import team.ubox.starry.dto.channel.ResponseChannelDTO;
+import team.ubox.starry.dto.channel.ChannelDTO;
 import team.ubox.starry.types.StreamStatus;
 
 @Getter
@@ -10,7 +10,7 @@ import team.ubox.starry.types.StreamStatus;
 @Builder
 @AllArgsConstructor
 public class ResponseStreamDTO {
-    private ResponseChannelDTO channel;
+    private ChannelDTO.Response channel;
     private StreamStatus status;
 
     private String streamId;

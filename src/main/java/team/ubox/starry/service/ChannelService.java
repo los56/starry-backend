@@ -5,13 +5,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import team.ubox.starry.dto.channel.ResponseChannelDTO;
+import team.ubox.starry.dto.channel.ChannelDTO;
 import team.ubox.starry.dto.channel.ResponseStreamKeyDTO;
 import team.ubox.starry.dto.stream.RequestChangeStreamInfoDTO;
 import team.ubox.starry.dto.channel.ResponseStreamInfoDTO;
 import team.ubox.starry.entity.Channel;
+import team.ubox.starry.entity.Follow;
 import team.ubox.starry.entity.User;
+import team.ubox.starry.exception.StarryError;
+import team.ubox.starry.exception.StarryException;
 import team.ubox.starry.repository.ChannelRepository;
+import team.ubox.starry.repository.FollowRepository;
 import team.ubox.starry.repository.UserRepository;
 import team.ubox.starry.types.UserRole;
 import team.ubox.starry.util.AuthUtil;
@@ -25,20 +29,21 @@ import java.util.Optional;
 public class ChannelService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final FollowRepository followRepository;
 
     public static final Integer STREAM_KEY_LENGTH = 32;
 
     @Transactional
-    public ResponseChannelDTO open() {
-        User authUser = AuthUtil.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+    public ChannelDTO.Response open() {
+        User authUser = AuthUtil.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
 
         Optional<Channel> findResult = channelRepository.findById(authUser.getId());
         if(findResult.isPresent()) {
-            throw new IllegalStateException("이미 채널이 개설된 사용자입니다.");
+            throw new StarryException(StarryError.ALREADY_OPENED_CHANNEL);
         }
 
 
-        User user = userRepository.findByUsername(authUser.getUsername()).orElseThrow(() -> new UsernameNotFoundException("잘못된 사용자 정보"));
+        User user = userRepository.findByUsername(authUser.getUsername()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_USER));
         user.updateRole(new UserRole[] {UserRole.USER, UserRole.STREAMER});
 
         String streamKey = CommonUtil.generateRandomString(STREAM_KEY_LENGTH);
@@ -52,22 +57,24 @@ public class ChannelService {
                         .streamCategory("Talking")
                         .build());
 
-        return ResponseChannelDTO.from(channel);
+        return ChannelDTO.Response.from(channel);
     }
 
-    public ResponseChannelDTO channelData(String channelId) {
-        Channel channel = channelRepository.findById(UUIDUtil.stringToUUID(channelId)).orElseThrow(() -> new IllegalStateException("존재하지 않는 채널"));
+    public ChannelDTO.Response channelData(String channelId) {
+        Channel channel = channelRepository.findById(UUIDUtil.stringToUUID(channelId)).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
+        ChannelDTO.Response dto = ChannelDTO.Response.from(channel);
+        dto.setFollowers(followRepository.countByToUser(channel.getId()));
 
-        return ResponseChannelDTO.from(channel);
+        return dto;
     }
 
     @Transactional
     public ResponseStreamKeyDTO generateStreamKey() {
-        User authUser = AuthUtil.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        User authUser = AuthUtil.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
 
         String key = CommonUtil.generateRandomString(STREAM_KEY_LENGTH);
 
-        Channel channel = channelRepository.findById(authUser.getId()).orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        Channel channel = channelRepository.findById(authUser.getId()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
         channel.updateStreamKey(key);
 
         ResponseStreamKeyDTO responseDto = new ResponseStreamKeyDTO();
@@ -79,8 +86,8 @@ public class ChannelService {
 
     @Transactional
     public ResponseStreamInfoDTO changeStreamInfo(@Valid RequestChangeStreamInfoDTO dto) {
-        User user = AuthUtil.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
-        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new IllegalStateException("채널이 없습니다."));
+        User user = AuthUtil.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
 
         channel.updateStreamInfo(dto.getStreamTitle(), dto.getStreamCategory());
 
@@ -92,8 +99,8 @@ public class ChannelService {
     }
 
     public ResponseStreamInfoDTO getStreamInfo() {
-        User user = AuthUtil.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
-        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new IllegalStateException("채널이 없습니다."));
+        User user = AuthUtil.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
 
         ResponseStreamInfoDTO dto = new ResponseStreamInfoDTO();
         dto.setStreamTitle(channel.getStreamTitle());
@@ -103,13 +110,41 @@ public class ChannelService {
     }
 
     public ResponseStreamKeyDTO getStreamKey() {
-        User user = AuthUtil.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
-        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new IllegalStateException("채널이 없습니다."));
+        User user = AuthUtil.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
 
         ResponseStreamKeyDTO dto = new ResponseStreamKeyDTO();
         dto.setId(UUIDUtil.UUIDToString(channel.getId()));
         dto.setStreamKey(channel.getStreamKey());
 
         return dto;
+    }
+
+
+    public Boolean follow(String id) {
+        User user = AuthUtil.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        Optional<Follow> follow = followRepository.findByFromUserAndToUser(user.getId(), UUIDUtil.stringToUUID(id));
+        if(follow.isPresent()) {
+            throw new StarryException(StarryError.ALREADY_FOLLOWED_CHANNEL);
+        }
+
+        Optional<Channel> channel = channelRepository.findById(UUIDUtil.stringToUUID(id));
+        if(channel.isEmpty()) {
+            throw new StarryException(StarryError.NOT_FOUND_CHANNEL);
+        }
+        followRepository.save(new Follow(user.getId(), channel.get().getId()));
+
+        return true;
+    }
+
+    public Boolean unFollow(String id) {
+        User user = AuthUtil.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        Optional<Follow> follow = followRepository.findByFromUserAndToUser(user.getId(), UUIDUtil.stringToUUID(id));
+        if(follow.isEmpty()) {
+            throw new StarryException(StarryError.NOT_FOLLOWED_CHANNEL);
+        }
+        followRepository.deleteById(follow.get().getIndex());
+
+        return true;
     }
 }

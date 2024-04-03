@@ -40,6 +40,8 @@ public class User implements UserDetails {
     private Timestamp createDate;
     private Timestamp passwordChangeDate;
 
+    private String profileImageUrl;
+
     public String getIdString() {
         return UUIDUtil.UUIDToString(this.id);
     }

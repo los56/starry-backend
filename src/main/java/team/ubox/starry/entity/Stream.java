@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.redis.core.RedisHash;
 
-import java.sql.Timestamp;
 import java.util.UUID;
 
 @Getter

@@ -5,7 +5,6 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,7 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import team.ubox.starry.dto.user.ResponseLoginDTO;
+import team.ubox.starry.dto.user.LoginDTO;
 import team.ubox.starry.entity.User;
 
 import javax.crypto.SecretKey;
@@ -23,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtProvider implements InitializingBean {
@@ -40,10 +38,10 @@ public class JwtProvider implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public ResponseLoginDTO createToken(Authentication authentication) {
+    public LoginDTO.Response createToken(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
 
-        return new ResponseLoginDTO(createAccessToken(user), createRefreshToken(user));
+        return new LoginDTO.Response(createAccessToken(user), createRefreshToken(user));
     }
 
     public String createAccessToken(User user) {
