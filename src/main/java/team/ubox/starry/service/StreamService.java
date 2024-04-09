@@ -55,7 +55,7 @@ public class StreamService {
     public void endPublish(String streamKey) {
         Optional<Channel> optionalChannel = channelRepository.findByStreamKey(streamKey);
         if(optionalChannel.isEmpty()) {
-            throw new StarryException(StarryError.NOT_FOUND_CHANNEL)
+            throw new StarryException(StarryError.NOT_FOUND_CHANNEL);
         }
 
         Channel channel = optionalChannel.get();
