@@ -18,8 +18,8 @@ CREATE TABLE channels (
     verified BOOLEAN NOT NULL,
     banner_url VARCHAR,
     stream_key VARCHAR NOT NULL,
-    live_title VARCHAR,
-    live_category VARCHAR,
+    stream_title VARCHAR,
+    stream_category VARCHAR,
     last_open_time TIMESTAMP,
     last_close_time TIMESTAMP,
     last_stream_id VARCHAR,
@@ -50,6 +50,40 @@ CREATE TABLE follows (
     index SERIAL PRIMARY KEY,
     from_user uuid NOT NULL,
     to_user uuid NOT NULL,
+    follow_date TIMESTAMP NOT NULL,
     FOREIGN KEY(from_user) REFERENCES "users"(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(to_user) REFERENCES "users"(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE static_files (
+    index SERIAL PRIMARY KEY,
+    uploader uuid,
+    file_name VARCHAR NOT NULL,
+    original_file_name VARCHAR NOT NULL,
+    upload_date TIMESTAMP NOT NULL,
+    uploader_ip VARCHAR NOT NULL,
+    FOREIGN KEY(uploader) REFERENCES "users"(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE streams (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    streamer uuid NOT NULL,
+    last_title VARCHAR,
+    last_category VARCHAR,
+    opened BOOLEAN NOT NULL,
+    open_time TIMESTAMP NOT NULL,
+    close_time TIMESTAMP,
+    FOREIGN KEY(streamer) REFERENCES "users"(id)
+);
+
+CREATE TABLE stream_histories (
+    id SERIAL PRIMARY KEY,
+    streamer uuid NOT NULL,
+    stream_id uuid NOT NULL,
+    title VARCHAR NOT NULL,
+    category VARCHAR NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP,
+    FOREIGN KEY(streamer) REFERENCES "users"(id),
+    FOREIGN KEY(stream_id) REFERENCES "streams"(id)
 );

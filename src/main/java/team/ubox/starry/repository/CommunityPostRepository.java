@@ -3,10 +3,9 @@ package team.ubox.starry.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import team.ubox.starry.entity.CommunityPost;
-import team.ubox.starry.entity.User;
+import team.ubox.starry.repository.entity.CommunityPost;
+import team.ubox.starry.repository.entity.User;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

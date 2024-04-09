@@ -1,7 +1,7 @@
 package team.ubox.starry.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import team.ubox.starry.entity.Channel;
+import team.ubox.starry.repository.entity.Channel;
 
 import java.util.Optional;
 import java.util.UUID;

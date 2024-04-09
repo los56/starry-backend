@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import team.ubox.starry.dto.StarryResponse;
-import team.ubox.starry.dto.stream.ResponseStreamDTO;
+import team.ubox.starry.service.dto.StarryResponse;
+import team.ubox.starry.service.dto.stream.ResponseStreamDTO;
 import team.ubox.starry.exception.StarryError;
 import team.ubox.starry.exception.StarryException;
 import team.ubox.starry.service.StreamService;
@@ -48,14 +48,13 @@ public class StreamController {
         if(key == null) {
             throw new StarryException(StarryError.INVALID_STREAM_KEY);
         }
-
-        Boolean result = streamService.endPublish(key);
+        streamService.endPublish(key);
 
         return ResponseEntity.ok(true);
     }
 
     @GetMapping("/live")
-    public StarryResponse<ResponseStreamDTO> live(@RequestParam(name="channel") String channelId) {
+    public StarryResponse<ResponseStreamDTO> getSteamDetail(@RequestParam(name="channel") String channelId) {
         return new StarryResponse<>(streamService.stream(channelId));
     }
 

@@ -1,7 +1,7 @@
 package team.ubox.starry.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import team.ubox.starry.entity.Follow;
+import team.ubox.starry.repository.entity.Follow;
 
 import java.util.List;
 import java.util.Optional;

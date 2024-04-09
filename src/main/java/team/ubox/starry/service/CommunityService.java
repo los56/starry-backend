@@ -6,15 +6,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import team.ubox.starry.dto.community.*;
-import team.ubox.starry.entity.CommunityPost;
-import team.ubox.starry.entity.CommunityReply;
-import team.ubox.starry.entity.User;
+import team.ubox.starry.repository.entity.CommunityPost;
+import team.ubox.starry.repository.entity.CommunityReply;
+import team.ubox.starry.repository.entity.User;
 import team.ubox.starry.repository.CommunityPostRepository;
 import team.ubox.starry.repository.CommunityReplyRepository;
 import team.ubox.starry.repository.UserRepository;
-import team.ubox.starry.util.AuthUtil;
-import team.ubox.starry.util.UUIDUtil;
+import team.ubox.starry.service.dto.community.PostDTO;
+import team.ubox.starry.service.dto.community.ReplyDTO;
+import team.ubox.starry.service.dto.community.ResponseCommunityUserDTO;
+import team.ubox.starry.helper.AuthHelper;
+import team.ubox.starry.helper.UUIDHelper;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -29,7 +31,7 @@ public class CommunityService {
     private final CommunityReplyRepository communityReplyRepository;
 
     public PostDTO.Response writePost(@Valid PostDTO.RequestWrite dto) {
-        User writer = AuthUtil.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        User writer = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
 
         CommunityPost post = communityPostRepository.save(CommunityPost.builder().writer(writer).title(dto.getTitle())
                 .content(dto.getContent()).writeDate(Timestamp.from(Instant.now())).build());
@@ -38,7 +40,7 @@ public class CommunityService {
     }
 
     public PostDTO.Response editPost(@Valid PostDTO.RequestEdit dto) {
-        User writer = AuthUtil.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        User writer = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
 
         CommunityPost post = communityPostRepository.findById(dto.getIndex()).orElseThrow(() -> new IllegalStateException("존재하지 않는 글"));
         if(!post.getWriter().getId().equals(writer.getId())) {
@@ -50,7 +52,7 @@ public class CommunityService {
     }
 
     public PostDTO.Response deletePost(Integer index) {
-        User writer = AuthUtil.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        User writer = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
 
         CommunityPost post = communityPostRepository.deleteByIndexAndWriterId(index, writer.getId())
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 글이거나 권한이 없습니다."));
@@ -66,7 +68,7 @@ public class CommunityService {
             pageRequest.withSort(Sort.Direction.DESC, "index");
         }
 
-        UUID writerId = UUIDUtil.stringToUUID(dto.getId());
+        UUID writerId = UUIDHelper.stringToUUID(dto.getId());
         User writer = userRepository.findById(writerId).orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
 
         Page<CommunityPost> page = communityPostRepository.findSliceByWriterId(writerId, pageRequest);
@@ -83,7 +85,7 @@ public class CommunityService {
     }
 
     public ReplyDTO.Response writeReply(@Valid ReplyDTO.RequestWrite dto) {
-        User authUser = AuthUtil.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        User authUser = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
 
         CommunityPost post = communityPostRepository.findById(dto.getPostIndex()).orElseThrow(() -> new IllegalStateException("존재하지 않는 글입니다."));
         CommunityReply reply = communityReplyRepository.save(
@@ -104,7 +106,7 @@ public class CommunityService {
     }
 
     public ReplyDTO.Response deleteReply(Integer index) {
-        User authUser = AuthUtil.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        User authUser = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
 
         CommunityReply reply = communityReplyRepository.deleteByIndexAndWriterId(index, authUser.getId()).orElseThrow(() -> new IllegalStateException("권한이 없습니다."));
 

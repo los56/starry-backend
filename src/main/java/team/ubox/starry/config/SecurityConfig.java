@@ -53,6 +53,9 @@ public class SecurityConfig {
                                 .requestMatchers("/api/user/reissue").permitAll()
                                 .requestMatchers("/api/user/duplicate").permitAll()
                                 .requestMatchers("/api/stream/**").permitAll()
+                                .requestMatchers("/api/file/image/**").permitAll()
+                                .requestMatchers("/api/file/test").permitAll()
+                                .requestMatchers("/*").permitAll()
                                 .anyRequest().authenticated()
                 ).addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();

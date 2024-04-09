@@ -3,11 +3,11 @@ package team.ubox.starry.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import team.ubox.starry.dto.StarryResponse;
-import team.ubox.starry.dto.community.*;
+import team.ubox.starry.service.dto.StarryResponse;
 import team.ubox.starry.exception.StarryError;
 import team.ubox.starry.exception.StarryException;
 import team.ubox.starry.service.CommunityService;
+import team.ubox.starry.service.dto.community.PostDTO;
 
 @RestController
 @RequestMapping("/api/community")
@@ -21,15 +21,15 @@ public class CommunityController {
     }
 
     @GetMapping("/post")
-    public StarryResponse<PostDTO.ResponseList> viewPost(@RequestParam String id, @RequestParam(defaultValue = "1") Integer page,
+    public StarryResponse<PostDTO.ResponseList> getPostDetail(@RequestParam String id, @RequestParam(defaultValue = "1") Integer page,
                                                          @RequestParam(defaultValue = "30") Integer count, @RequestParam(defaultValue = "false") Boolean isAscending) {
-        PostDTO.RequestList requestDto = new PostDTO.RequestList();
-        requestDto.setId(id);
-        requestDto.setPage(page);
-        requestDto.setPostPerPage(count);
-        requestDto.setIsAscending(isAscending);
+        PostDTO.RequestList dtoForFind = new PostDTO.RequestList();
+        dtoForFind.setId(id);
+        dtoForFind.setPage(page);
+        dtoForFind.setPostPerPage(count);
+        dtoForFind.setIsAscending(isAscending);
 
-        return new StarryResponse<>(communityService.viewPost(requestDto));
+        return new StarryResponse<>(communityService.viewPost(dtoForFind));
     }
 
     @DeleteMapping("/post")

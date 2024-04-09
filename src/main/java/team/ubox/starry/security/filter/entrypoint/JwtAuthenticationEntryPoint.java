@@ -19,7 +19,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final HandlerExceptionResolver handlerExceptionResolver;
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        //response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         handlerExceptionResolver.resolveException(request, response, null, new StarryException(StarryError.NEED_TOKEN));
     }
 

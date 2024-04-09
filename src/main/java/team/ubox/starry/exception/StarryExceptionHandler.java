@@ -7,9 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import team.ubox.starry.dto.StarryResponse;
-
-import java.util.Arrays;
+import team.ubox.starry.service.dto.StarryResponse;
 
 @RestControllerAdvice
 public class StarryExceptionHandler {

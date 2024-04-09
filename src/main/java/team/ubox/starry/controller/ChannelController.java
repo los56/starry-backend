@@ -1,17 +1,14 @@
 package team.ubox.starry.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import team.ubox.starry.dto.StarryResponse;
-import team.ubox.starry.dto.channel.ChannelDTO;
-import team.ubox.starry.dto.channel.ResponseStreamKeyDTO;
-import team.ubox.starry.dto.stream.RequestChangeStreamInfoDTO;
-import team.ubox.starry.dto.channel.ResponseStreamInfoDTO;
+import team.ubox.starry.service.dto.StarryResponse;
+import team.ubox.starry.service.dto.channel.ChannelDTO;
+import team.ubox.starry.service.dto.stream.ResponseFollowListDTO;
 import team.ubox.starry.exception.StarryError;
 import team.ubox.starry.exception.StarryException;
 import team.ubox.starry.service.ChannelService;
-import team.ubox.starry.util.UUIDUtil;
+import team.ubox.starry.helper.UUIDHelper;
 
 @RestController
 @RequestMapping("/api/channel")
@@ -20,60 +17,54 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @PostMapping("/open")
-    public StarryResponse<ChannelDTO.Response> open() {
+    public StarryResponse<ChannelDTO.Response> openChannel() {
         return new StarryResponse<>(channelService.open());
     }
 
     @GetMapping("")
-    public StarryResponse<ChannelDTO.Response> channelData(@RequestParam String id) {
+    public StarryResponse<ChannelDTO.Response> getChannelDetail(@RequestParam String id) {
         if(id == null || id.isEmpty()) {
             throw new StarryException(StarryError.BLANK_CHANNEL_ID);
-        } else if(!UUIDUtil.checkParsable(id)) {
+        } else if(!UUIDHelper.checkParsable(id)) {
             throw new StarryException(StarryError.INVALID_CHANNEL_ID);
         }
 
         return new StarryResponse<>(channelService.channelData(id));
     }
 
-    @GetMapping("/follow")
-    public StarryResponse<Boolean> follow(@RequestParam String to) {
-        if(to == null || to.isEmpty()) {
+    @GetMapping("/follow-list")
+    public StarryResponse<ResponseFollowListDTO> getUserFollowingList() {
+        return new StarryResponse<>(channelService.followList());
+    }
+
+    @PostMapping("/follow")
+    public StarryResponse<Boolean> doFollow(@RequestParam String toChannelId) {
+        if(toChannelId == null || toChannelId.isEmpty()) {
             throw new StarryException(StarryError.BLANK_CHANNEL_ID);
-        } else if(!UUIDUtil.checkParsable(to)) {
+        } else if(!UUIDHelper.checkParsable(toChannelId)) {
             throw new StarryException(StarryError.INVALID_CHANNEL_ID);
         }
 
-        return new StarryResponse<>(channelService.follow(to));
+        return new StarryResponse<>(channelService.follow(toChannelId));
     }
 
-    @GetMapping("/un-follow")
-    public StarryResponse<Boolean> unFollow(@RequestParam String to) {
-        if(to == null || to.isEmpty()) {
+    @PostMapping("/un-follow")
+    public StarryResponse<Boolean> doUnFollow(@RequestParam String toChannelId) {
+        if(toChannelId == null || toChannelId.isEmpty()) {
             throw new StarryException(StarryError.BLANK_CHANNEL_ID);
-        } else if(!UUIDUtil.checkParsable(to)) {
+        } else if(!UUIDHelper.checkParsable(toChannelId)) {
             throw new StarryException(StarryError.INVALID_CHANNEL_ID);
         }
 
-        return new StarryResponse<>(channelService.unFollow(to));
+        return new StarryResponse<>(channelService.unFollow(toChannelId));
     }
 
-    @GetMapping("/studio/regen-key")
-    public StarryResponse<ResponseStreamKeyDTO> generateStreamKey() {
-        return new StarryResponse<>(channelService.generateStreamKey());
-    }
+    @GetMapping("/relation")
+    public StarryResponse<ChannelDTO.ResponseRelation> getRelation(@RequestParam String channelId) {
+        if(!UUIDHelper.checkParsable(channelId)) {
+            throw new StarryException(StarryError.INVALID_CHANNEL_ID);
+        }
 
-    @GetMapping("/studio/stream-info")
-    public StarryResponse<ResponseStreamInfoDTO> streamInfo() {
-        return new StarryResponse<>(channelService.getStreamInfo());
-    }
-
-    @PostMapping("/studio/change-stream-info")
-    public StarryResponse<ResponseStreamInfoDTO> changeStreamInfo(@Valid @RequestBody RequestChangeStreamInfoDTO dto) {
-        return new StarryResponse<>(channelService.changeStreamInfo(dto));
-    }
-
-    @GetMapping("/studio/stream-key")
-    public StarryResponse<ResponseStreamKeyDTO> streamKey() {
-        return new StarryResponse<>(channelService.getStreamKey());
+        return new StarryResponse<>(channelService.relation(channelId));
     }
 }

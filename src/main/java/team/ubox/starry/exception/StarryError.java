@@ -31,8 +31,15 @@ public enum StarryError {
     ALREADY_FOLLOWED_CHANNEL("ALREADY_FOLLOWED_CHANNEL", "이미 팔로우 중입니다.", 400),
     NOT_FOLLOWED_CHANNEL("NOT_FOLLOWED_CHANNEL", "팔로우 중이 아닙니다.", 400),
 
+    // STATIC FILE
+    EXCEED_FILE_SIZE("EXCEED_FILE_SIZE", "파일 크기를 초과했습니다.", 400),
+    NOT_ALLOW_FILE_TYPE("NOT_ALLOW_FILE_TYPE", "허용되지 않는 파일 유형입니다.", 400),
+    FILE_NOT_FOUND("FILE_NOT_FOUND", "파일이 존재하지 않습니다.", 404),
+
+
     // COMMON
-    NEGATIVE_INDEX("NEGATIVE_INDEX", "인덱스 값이 음수입니다.", 400)
+    NEGATIVE_INDEX("NEGATIVE_INDEX", "인덱스 값이 음수입니다.", 400),
+    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "내부 서버 오류입니다.", 500)
 
     ;
 

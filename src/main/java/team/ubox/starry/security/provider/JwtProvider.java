@@ -14,8 +14,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import team.ubox.starry.dto.user.LoginDTO;
-import team.ubox.starry.entity.User;
+import team.ubox.starry.service.dto.user.LoginDTO;
+import team.ubox.starry.repository.entity.User;
 
 import javax.crypto.SecretKey;
 import java.util.Arrays;

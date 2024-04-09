@@ -5,9 +5,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import team.ubox.starry.dto.StarryResponse;
-import team.ubox.starry.dto.user.*;
+import team.ubox.starry.service.dto.StarryResponse;
 import team.ubox.starry.service.UserService;
+import team.ubox.starry.service.dto.user.LoginDTO;
+import team.ubox.starry.service.dto.user.RegisterDTO;
+import team.ubox.starry.service.dto.user.UserDTO;
 
 @RestController
 @RequestMapping("/api/user")
@@ -36,12 +38,12 @@ public class UserController {
     }
 
     @GetMapping("/user-info")
-    public StarryResponse<UserDTO.Response> userInfo() {
+    public StarryResponse<UserDTO.Response> getUserInfo() {
         return new StarryResponse<>(userService.userInfo());
     }
 
     @GetMapping("/duplicate")
-    public StarryResponse<Boolean> duplicateCheck(@RequestParam String method, @RequestParam String data) {
+    public StarryResponse<Boolean> checkDuplicate(@RequestParam String method, @RequestParam String data) {
         Boolean result;
         if(data.isEmpty()) {
             throw new IllegalArgumentException("data에 값이 없습니다.");
