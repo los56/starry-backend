@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 
 @Getter
 @Setter
-public class StarryImage {
+public class CustomImage {
     private BufferedImage bufferedImage;
     private String extension;
 }

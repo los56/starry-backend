@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import team.ubox.starry.service.dto.StarryResponse;
+import team.ubox.starry.service.dto.CustomResponse;
 import team.ubox.starry.service.UserService;
 import team.ubox.starry.service.dto.user.LoginDTO;
 import team.ubox.starry.service.dto.user.RegisterDTO;
@@ -22,28 +22,28 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public StarryResponse<LoginDTO.Response> login(@Valid @RequestBody LoginDTO.Request dto) {
-        return new StarryResponse<>(userService.login(dto));
+    public CustomResponse<LoginDTO.Response> login(@Valid @RequestBody LoginDTO.Request dto) {
+        return new CustomResponse<>(userService.login(dto));
     }
 
     @PatchMapping("/reissue")
-    public StarryResponse<LoginDTO.Response> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public CustomResponse<LoginDTO.Response> reissue(HttpServletRequest request, HttpServletResponse response) {
         String token = request.getHeader("refreshToken");
-        return new StarryResponse<>(userService.reissue(token));
+        return new CustomResponse<>(userService.reissue(token));
     }
 
     @PostMapping("/register")
-    public StarryResponse<RegisterDTO.Response> register(@Valid @RequestBody RegisterDTO.Request dto) {
-        return new StarryResponse<>(userService.register(dto));
+    public CustomResponse<RegisterDTO.Response> register(@Valid @RequestBody RegisterDTO.Request dto) {
+        return new CustomResponse<>(userService.register(dto));
     }
 
     @GetMapping("/user-info")
-    public StarryResponse<UserDTO.Response> getUserInfo() {
-        return new StarryResponse<>(userService.userInfo());
+    public CustomResponse<UserDTO.Response> getUserInfo() {
+        return new CustomResponse<>(userService.userInfo());
     }
 
     @GetMapping("/duplicate")
-    public StarryResponse<Boolean> checkDuplicate(@RequestParam String method, @RequestParam String data) {
+    public CustomResponse<Boolean> checkDuplicate(@RequestParam String method, @RequestParam String data) {
         Boolean result;
         if(data.isEmpty()) {
             throw new IllegalArgumentException("data에 값이 없습니다.");
@@ -56,7 +56,7 @@ public class UserController {
             default -> throw new IllegalArgumentException("method가 잘못되었습니다.");
         }
 
-        return new StarryResponse<>(result);
+        return new CustomResponse<>(result);
     }
 
 }

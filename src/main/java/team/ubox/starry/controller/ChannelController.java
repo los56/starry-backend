@@ -2,11 +2,11 @@ package team.ubox.starry.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import team.ubox.starry.service.dto.StarryResponse;
+import team.ubox.starry.service.dto.CustomResponse;
 import team.ubox.starry.service.dto.channel.ChannelDTO;
 import team.ubox.starry.service.dto.stream.ResponseFollowListDTO;
-import team.ubox.starry.exception.StarryError;
-import team.ubox.starry.exception.StarryException;
+import team.ubox.starry.exception.CustomError;
+import team.ubox.starry.exception.CustomException;
 import team.ubox.starry.service.ChannelService;
 import team.ubox.starry.helper.UUIDHelper;
 
@@ -17,54 +17,54 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @PostMapping("/open")
-    public StarryResponse<ChannelDTO.Response> openChannel() {
-        return new StarryResponse<>(channelService.open());
+    public CustomResponse<ChannelDTO.Response> openChannel() {
+        return new CustomResponse<>(channelService.open());
     }
 
     @GetMapping("")
-    public StarryResponse<ChannelDTO.Response> getChannelDetail(@RequestParam String id) {
+    public CustomResponse<ChannelDTO.Response> getChannelDetail(@RequestParam String id) {
         if(id == null || id.isEmpty()) {
-            throw new StarryException(StarryError.BLANK_CHANNEL_ID);
+            throw new CustomException(CustomError.BLANK_CHANNEL_ID);
         } else if(!UUIDHelper.checkParsable(id)) {
-            throw new StarryException(StarryError.INVALID_CHANNEL_ID);
+            throw new CustomException(CustomError.INVALID_CHANNEL_ID);
         }
 
-        return new StarryResponse<>(channelService.channelData(id));
+        return new CustomResponse<>(channelService.channelData(id));
     }
 
     @GetMapping("/follow-list")
-    public StarryResponse<ResponseFollowListDTO> getUserFollowingList() {
-        return new StarryResponse<>(channelService.followList());
+    public CustomResponse<ResponseFollowListDTO> getUserFollowingList() {
+        return new CustomResponse<>(channelService.followList());
     }
 
-    @PostMapping("/follow")
-    public StarryResponse<Boolean> doFollow(@RequestParam String toChannelId) {
-        if(toChannelId == null || toChannelId.isEmpty()) {
-            throw new StarryException(StarryError.BLANK_CHANNEL_ID);
-        } else if(!UUIDHelper.checkParsable(toChannelId)) {
-            throw new StarryException(StarryError.INVALID_CHANNEL_ID);
+    @GetMapping("/follow")
+    public CustomResponse<Boolean> doFollow(@RequestParam String to) {
+        if(to == null || to.isEmpty()) {
+            throw new CustomException(CustomError.BLANK_CHANNEL_ID);
+        } else if(!UUIDHelper.checkParsable(to)) {
+            throw new CustomException(CustomError.INVALID_CHANNEL_ID);
         }
 
-        return new StarryResponse<>(channelService.follow(toChannelId));
+        return new CustomResponse<>(channelService.follow(to));
     }
 
-    @PostMapping("/un-follow")
-    public StarryResponse<Boolean> doUnFollow(@RequestParam String toChannelId) {
-        if(toChannelId == null || toChannelId.isEmpty()) {
-            throw new StarryException(StarryError.BLANK_CHANNEL_ID);
-        } else if(!UUIDHelper.checkParsable(toChannelId)) {
-            throw new StarryException(StarryError.INVALID_CHANNEL_ID);
+    @GetMapping("/un-follow")
+    public CustomResponse<Boolean> doUnFollow(@RequestParam String to) {
+        if(to == null || to.isEmpty()) {
+            throw new CustomException(CustomError.BLANK_CHANNEL_ID);
+        } else if(!UUIDHelper.checkParsable(to)) {
+            throw new CustomException(CustomError.INVALID_CHANNEL_ID);
         }
 
-        return new StarryResponse<>(channelService.unFollow(toChannelId));
+        return new CustomResponse<>(channelService.unFollow(to));
     }
 
     @GetMapping("/relation")
-    public StarryResponse<ChannelDTO.ResponseRelation> getRelation(@RequestParam String channelId) {
+    public CustomResponse<ChannelDTO.ResponseRelation> getRelation(@RequestParam String channelId) {
         if(!UUIDHelper.checkParsable(channelId)) {
-            throw new StarryException(StarryError.INVALID_CHANNEL_ID);
+            throw new CustomException(CustomError.INVALID_CHANNEL_ID);
         }
 
-        return new StarryResponse<>(channelService.relation(channelId));
+        return new CustomResponse<>(channelService.relation(channelId));
     }
 }

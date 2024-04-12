@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
-import team.ubox.starry.exception.StarryError;
-import team.ubox.starry.exception.StarryException;
+import team.ubox.starry.exception.CustomError;
+import team.ubox.starry.exception.CustomException;
 import team.ubox.starry.helper.AuthHelper;
 import team.ubox.starry.helper.FileHelper;
 import team.ubox.starry.processor.ImageProcessor;
-import team.ubox.starry.processor.StarryImage;
+import team.ubox.starry.processor.CustomImage;
 import team.ubox.starry.repository.StaticFileRepository;
 import team.ubox.starry.repository.entity.StaticFile;
 import team.ubox.starry.repository.entity.User;
@@ -37,22 +37,22 @@ public class FileService {
     private String storePath;
 
     public FileDTO.ResponseImage uploadProfileImage(MultipartFile multipartFile) {
-        User user = AuthHelper.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        User user = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
 
         String ip = getIp();
 
         if(multipartFile.getSize() > (1024 * 1024 * 10L)) {
-            throw new StarryException(StarryError.EXCEED_FILE_SIZE);
+            throw new CustomException(CustomError.EXCEED_FILE_SIZE);
         }
 
         String originalFileName = multipartFile.getOriginalFilename();
         if(originalFileName == null) {
-            throw new StarryException(StarryError.NOT_ALLOW_FILE_TYPE);
+            throw new CustomException(CustomError.NOT_ALLOW_FILE_TYPE);
         }
 
         String ext = FileHelper.getExtension(originalFileName);
         if(ext == null || (!ext.equals("png") && !ext.equals("jpg"))) {
-            throw new StarryException(StarryError.NOT_ALLOW_FILE_TYPE);
+            throw new CustomException(CustomError.NOT_ALLOW_FILE_TYPE);
         }
 
         String generatedName = UUID.randomUUID() + "." + ext;
@@ -61,7 +61,7 @@ public class FileService {
         try {
             multipartFile.transferTo(newFile);
         } catch (IOException e) {
-            throw new StarryException(StarryError.INTERNAL_SERVER_ERROR);
+            throw new CustomException(CustomError.INTERNAL_SERVER_ERROR);
         }
 
         StaticFile staticFile = staticFileRepository.save(StaticFile.builder()
@@ -90,11 +90,11 @@ public class FileService {
     public byte[] getImageByteArray(String fileName, String size) {
         File file = new File(storePath + "/" + fileName);
 
-        StarryImage image;
+        CustomImage image;
         try {
             image = imageProcessor.createImageFromFile(file);
         } catch (IOException e) {
-            throw new StarryException(StarryError.FILE_NOT_FOUND);
+            throw new CustomException(CustomError.FILE_NOT_FOUND);
         }
 
         try {
@@ -110,7 +110,7 @@ public class FileService {
         try {
             imageByteArray = imageProcessor.imageToByteArray(image);
         } catch (IOException e) {
-            throw new StarryException(StarryError.INTERNAL_SERVER_ERROR);
+            throw new CustomException(CustomError.INTERNAL_SERVER_ERROR);
         }
 
 

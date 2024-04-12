@@ -40,7 +40,7 @@ public class UserRepositoryTests {
     @Test
     void findAll() {
         List<User> result = this.userRepository.findAll();
-        Assertions.assertEquals(result.size(), 2);
+        Assertions.assertEquals(2, result.size());
 
         System.out.println("result.get(0) = " + result.get(0).getId());
     }
@@ -48,7 +48,7 @@ public class UserRepositoryTests {
     @Test
     void findAll2() {
         List<User> result = this.userRepository.findAll();
-        Assertions.assertEquals(result.size(), 2);
+        Assertions.assertEquals(2, result.size());
 
         System.out.println("result.get(0) = " + result.get(0).getId());
     }

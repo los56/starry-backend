@@ -23,15 +23,15 @@ public class UUIDHelperTests {
         String uuidStr = UUIDHelper.UUIDToString(testUUID);
 
         // Success
-        Assertions.assertEquals(UUIDHelper.checkParsable(uuidStr), true);
+        Assertions.assertEquals(true, UUIDHelper.checkParsable(uuidStr));
 
         // Shorter than 32 (len: 27)
-        Assertions.assertEquals(UUIDHelper.checkParsable("qwertyuiopasdfghjklzxcvbnm"), false);
+        Assertions.assertEquals(false, UUIDHelper.checkParsable("qwertyuiopasdfghjklzxcvbnm"));
 
         // With uppercase
-        Assertions.assertEquals(UUIDHelper.checkParsable("D416798c0929428ca648fd03ea29a121"), false);
+        Assertions.assertEquals(false, UUIDHelper.checkParsable("D416798c0929428ca648fd03ea29a121"));
 
         // With special character
-        Assertions.assertEquals(UUIDHelper.checkParsable("d416798c0929428ca648f^03ea29a121"), false);
+        Assertions.assertEquals(false, UUIDHelper.checkParsable("d416798c0929428ca648f^03ea29a121"));
     }
 }

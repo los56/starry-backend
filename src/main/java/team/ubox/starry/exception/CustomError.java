@@ -3,7 +3,7 @@ package team.ubox.starry.exception;
 import lombok.Getter;
 
 @Getter
-public enum StarryError {
+public enum CustomError {
     INVALID_TOKEN("INVALID_TOKEN", "잘못된 인증 토큰입니다.", 401),
     NEED_TOKEN("NEED_TOKEN", "인증 토큰이 필요합니다.", 401),
     FORBIDDEN("FORBIDDEN", "권한이 없습니다", 403),
@@ -31,6 +31,10 @@ public enum StarryError {
     ALREADY_FOLLOWED_CHANNEL("ALREADY_FOLLOWED_CHANNEL", "이미 팔로우 중입니다.", 400),
     NOT_FOLLOWED_CHANNEL("NOT_FOLLOWED_CHANNEL", "팔로우 중이 아닙니다.", 400),
 
+    // CHAT
+    NOT_FOUND_SESSION("NOT_FOUND_SESSION", "채팅 세션을 찾을 수 없습니다.", 404),
+    GUEST_SESSION("GUEST_SESSION", "채팅을 보낼 권한이 없습니다.", 401),
+
     // STATIC FILE
     EXCEED_FILE_SIZE("EXCEED_FILE_SIZE", "파일 크기를 초과했습니다.", 400),
     NOT_ALLOW_FILE_TYPE("NOT_ALLOW_FILE_TYPE", "허용되지 않는 파일 유형입니다.", 400),
@@ -46,7 +50,7 @@ public enum StarryError {
     private final String errorType;
     private final String message;
     private final Integer defaultStatus;
-    StarryError(String errorType, String message, Integer defaultStatus) {
+    CustomError(String errorType, String message, Integer defaultStatus) {
         this.errorType = errorType;
         this.message = message;
         this.defaultStatus = defaultStatus;

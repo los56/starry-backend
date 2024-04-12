@@ -14,8 +14,8 @@ import team.ubox.starry.repository.entity.Channel;
 import team.ubox.starry.repository.entity.Follow;
 import team.ubox.starry.repository.entity.redis.StreamRedis;
 import team.ubox.starry.repository.entity.User;
-import team.ubox.starry.exception.StarryError;
-import team.ubox.starry.exception.StarryException;
+import team.ubox.starry.exception.CustomError;
+import team.ubox.starry.exception.CustomException;
 import team.ubox.starry.repository.ChannelRepository;
 import team.ubox.starry.repository.FollowRepository;
 import team.ubox.starry.repository.redis.StreamRedisRepository;
@@ -42,15 +42,15 @@ public class ChannelService {
 
     @Transactional
     public ChannelDTO.Response open() {
-        User authUser = AuthHelper.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        User authUser = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
 
         Optional<Channel> findResult = channelRepository.findById(authUser.getId());
         if(findResult.isPresent()) {
-            throw new StarryException(StarryError.ALREADY_OPENED_CHANNEL);
+            throw new CustomException(CustomError.ALREADY_OPENED_CHANNEL);
         }
 
 
-        User user = userRepository.findByUsername(authUser.getUsername()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_USER));
+        User user = userRepository.findByUsername(authUser.getUsername()).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_USER));
         user.updateRole(new UserRole[] {UserRole.USER, UserRole.STREAMER});
 
         String streamKey = StringHelper.generateRandomString(STREAM_KEY_LENGTH);
@@ -68,7 +68,7 @@ public class ChannelService {
     }
 
     public ChannelDTO.Response channelData(String channelId) {
-        Channel channel = channelRepository.findById(UUIDHelper.stringToUUID(channelId)).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
+        Channel channel = channelRepository.findById(UUIDHelper.stringToUUID(channelId)).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_CHANNEL));
         ChannelDTO.Response dto = ChannelDTO.Response.from(channel);
         dto.setFollowers(followRepository.countByToUser(channel.getId()));
 
@@ -77,11 +77,11 @@ public class ChannelService {
 
     @Transactional
     public ResponseStreamKeyDTO generateStreamKey() {
-        User authUser = AuthHelper.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        User authUser = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
 
         String key = StringHelper.generateRandomString(STREAM_KEY_LENGTH);
 
-        Channel channel = channelRepository.findById(authUser.getId()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
+        Channel channel = channelRepository.findById(authUser.getId()).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_CHANNEL));
         channel.updateStreamKey(key);
 
         ResponseStreamKeyDTO responseDto = new ResponseStreamKeyDTO();
@@ -93,8 +93,8 @@ public class ChannelService {
 
     @Transactional
     public ResponseStreamInfoDTO changeStreamInfo(@Valid RequestChangeStreamInfoDTO dto) {
-        User user = AuthHelper.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
-        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
+        User user = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_CHANNEL));
 
         channel.updateStreamInfo(dto.getStreamTitle(), dto.getStreamCategory());
 
@@ -106,8 +106,8 @@ public class ChannelService {
     }
 
     public ResponseStreamInfoDTO getStreamInfo() {
-        User user = AuthHelper.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
-        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
+        User user = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_CHANNEL));
 
         ResponseStreamInfoDTO dto = new ResponseStreamInfoDTO();
         dto.setStreamTitle(channel.getStreamTitle());
@@ -117,8 +117,8 @@ public class ChannelService {
     }
 
     public ResponseStreamKeyDTO getStreamKey() {
-        User user = AuthHelper.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
-        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
+        User user = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        Channel channel = channelRepository.findById(user.getId()).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_CHANNEL));
 
         ResponseStreamKeyDTO dto = new ResponseStreamKeyDTO();
         dto.setId(UUIDHelper.UUIDToString(channel.getId()));
@@ -129,15 +129,15 @@ public class ChannelService {
 
 
     public Boolean follow(String id) {
-        User user = AuthHelper.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        User user = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
         Optional<Follow> follow = followRepository.findByFromUserAndToUser(user.getId(), UUIDHelper.stringToUUID(id));
         if(follow.isPresent()) {
-            throw new StarryException(StarryError.ALREADY_FOLLOWED_CHANNEL);
+            throw new CustomException(CustomError.ALREADY_FOLLOWED_CHANNEL);
         }
 
         Optional<Channel> channel = channelRepository.findById(UUIDHelper.stringToUUID(id));
         if(channel.isEmpty()) {
-            throw new StarryException(StarryError.NOT_FOUND_CHANNEL);
+            throw new CustomException(CustomError.NOT_FOUND_CHANNEL);
         }
         followRepository.save(new Follow(user.getId(), channel.get().getId()));
 
@@ -145,10 +145,10 @@ public class ChannelService {
     }
 
     public Boolean unFollow(String id) {
-        User user = AuthHelper.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        User user = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
         Optional<Follow> follow = followRepository.findByFromUserAndToUser(user.getId(), UUIDHelper.stringToUUID(id));
         if(follow.isEmpty()) {
-            throw new StarryException(StarryError.NOT_FOLLOWED_CHANNEL);
+            throw new CustomException(CustomError.NOT_FOLLOWED_CHANNEL);
         }
         followRepository.delete(follow.get());
 
@@ -156,7 +156,7 @@ public class ChannelService {
     }
 
     public ResponseFollowListDTO followList() {
-        User user = AuthHelper.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        User user = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
         List<UUID> follows = followRepository.findAllByFromUser(user.getId()).stream().map(Follow::getToUser).toList();
         List<Channel> channels = channelRepository.findAllById(follows);
         List<ResponseStreamDTO> streams = channels.stream().map(this::mappingStreamDTO).toList();
@@ -165,7 +165,7 @@ public class ChannelService {
     }
 
     public ChannelDTO.ResponseRelation relation(String channelId) {
-        User user = AuthHelper.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        User user = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
         Optional<Follow> follow = followRepository.findByFromUserAndToUser(user.getId(), UUIDHelper.stringToUUID(channelId));
 
         return new ChannelDTO.ResponseRelation(channelId, follow.isPresent());
@@ -185,6 +185,7 @@ public class ChannelService {
             StreamRedis streamRedis = optionalStream.get();
             responseStreamDTO.setStreamId(streamRedis.getStreamId());
             responseStreamDTO.setStatus(StreamStatus.LIVE);
+            responseStreamDTO.setViewersCount(streamRedis.getViewers());
         }
 
         return responseStreamDTO;

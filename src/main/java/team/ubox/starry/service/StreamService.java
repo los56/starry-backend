@@ -7,10 +7,9 @@ import team.ubox.starry.service.dto.channel.ChannelDTO;
 import team.ubox.starry.service.dto.stream.ResponseStreamDTO;
 import team.ubox.starry.repository.entity.Channel;
 import team.ubox.starry.repository.entity.redis.StreamRedis;
-import team.ubox.starry.exception.StarryError;
-import team.ubox.starry.exception.StarryException;
+import team.ubox.starry.exception.CustomError;
+import team.ubox.starry.exception.CustomException;
 import team.ubox.starry.repository.ChannelRepository;
-import team.ubox.starry.repository.FollowRepository;
 import team.ubox.starry.repository.redis.StreamRedisRepository;
 import team.ubox.starry.types.StreamStatus;
 import team.ubox.starry.helper.StringHelper;
@@ -46,6 +45,7 @@ public class StreamService {
                 .id(channel.getId())
                 .streamId(streamId)
                 .openTime(Timestamp.from(Instant.now()).toString())
+                .viewers(0)
                 .build());
 
         return streamId;
@@ -55,12 +55,12 @@ public class StreamService {
     public void endPublish(String streamKey) {
         Optional<Channel> optionalChannel = channelRepository.findByStreamKey(streamKey);
         if(optionalChannel.isEmpty()) {
-            throw new StarryException(StarryError.NOT_FOUND_CHANNEL);
+            throw new CustomException(CustomError.NOT_FOUND_CHANNEL);
         }
 
         Channel channel = optionalChannel.get();
 
-        StreamRedis streamRedis = streamRedisRepository.findById(channel.getId()).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_STREAM));
+        StreamRedis streamRedis = streamRedisRepository.findById(channel.getId()).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_STREAM));
         channel.updateLastStream(streamRedis.getStreamId(), Timestamp.valueOf(streamRedis.getOpenTime()), Timestamp.from(Instant.now()));
 
         streamRedisRepository.deleteById(channel.getId());
@@ -68,7 +68,7 @@ public class StreamService {
 
     public ResponseStreamDTO stream(String channelId) {
         Optional<StreamRedis> optionalStream = streamRedisRepository.findById(UUIDHelper.stringToUUID(channelId));
-        Channel channel = channelRepository.findById(UUIDHelper.stringToUUID(channelId)).orElseThrow(() -> new StarryException(StarryError.NOT_FOUND_CHANNEL));
+        Channel channel = channelRepository.findById(UUIDHelper.stringToUUID(channelId)).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_CHANNEL));
 
         ResponseStreamDTO responseStreamDTO = ResponseStreamDTO.builder()
                 .channel(ChannelDTO.Response.from(channel))
@@ -81,8 +81,10 @@ public class StreamService {
 
             responseStreamDTO.setStreamId(streamRedis.getStreamId());
             responseStreamDTO.setStatus(StreamStatus.LIVE);
+            responseStreamDTO.setViewersCount(streamRedis.getViewers());
         } else {
             responseStreamDTO.setStatus(StreamStatus.CLOSE);
+            responseStreamDTO.setStreamId(channel.getLastStreamId());
         }
 
         return responseStreamDTO;

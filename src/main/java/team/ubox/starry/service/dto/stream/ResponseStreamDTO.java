@@ -17,4 +17,6 @@ public class ResponseStreamDTO {
 
     private String streamTitle;
     private String streamCategory;
+
+    private Integer viewersCount;
 }

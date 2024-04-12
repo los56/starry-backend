@@ -2,14 +2,13 @@ package team.ubox.starry.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import team.ubox.starry.helper.FileHelper;
-import team.ubox.starry.service.dto.StarryResponse;
+import team.ubox.starry.service.dto.CustomResponse;
 import team.ubox.starry.service.dto.file.FileDTO;
-import team.ubox.starry.exception.StarryError;
-import team.ubox.starry.exception.StarryException;
+import team.ubox.starry.exception.CustomError;
+import team.ubox.starry.exception.CustomException;
 import team.ubox.starry.service.FileService;
 
 import java.io.IOException;
@@ -23,8 +22,8 @@ public class FileController {
     private final FileService staticFileService;
 
     @PostMapping("/upload-image")
-    public StarryResponse<FileDTO.ResponseImage> uploadProfileImage(@RequestParam MultipartFile uploadFile) {
-        return new StarryResponse<>(staticFileService.uploadProfileImage(uploadFile));
+    public CustomResponse<FileDTO.ResponseImage> uploadProfileImage(@RequestParam MultipartFile uploadFile) {
+        return new CustomResponse<>(staticFileService.uploadProfileImage(uploadFile));
     }
 
 
@@ -40,7 +39,7 @@ public class FileController {
             responseOutputStream.write(imageByteArray);
             responseOutputStream.close();
         } catch (IOException e) {
-            throw new StarryException(StarryError.INTERNAL_SERVER_ERROR);
+            throw new CustomException(CustomError.INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -3,39 +3,36 @@ package team.ubox.starry.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import team.ubox.starry.service.dto.StarryResponse;
+import org.springframework.web.bind.annotation.*;
+import team.ubox.starry.service.dto.CustomResponse;
 import team.ubox.starry.service.dto.channel.ResponseStreamInfoDTO;
 import team.ubox.starry.service.dto.channel.ResponseStreamKeyDTO;
 import team.ubox.starry.service.dto.stream.RequestChangeStreamInfoDTO;
 import team.ubox.starry.service.ChannelService;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/studio")
 public class StudioController {
     private final ChannelService channelService;
 
-    @GetMapping("/studio/regen-key")
-    public StarryResponse<ResponseStreamKeyDTO> generateStreamKey() {
-        return new StarryResponse<>(channelService.generateStreamKey());
+    @GetMapping("/regen-key")
+    public CustomResponse<ResponseStreamKeyDTO> generateStreamKey() {
+        return new CustomResponse<>(channelService.generateStreamKey());
     }
 
-    @GetMapping("/studio/stream-info")
-    public StarryResponse<ResponseStreamInfoDTO> getStreamInfo() {
-        return new StarryResponse<>(channelService.getStreamInfo());
+    @GetMapping("/stream-info")
+    public CustomResponse<ResponseStreamInfoDTO> getStreamInfo() {
+        return new CustomResponse<>(channelService.getStreamInfo());
     }
 
-    @PostMapping("/studio/change-stream-info")
-    public StarryResponse<ResponseStreamInfoDTO> changeStreamInfo(@Valid @RequestBody RequestChangeStreamInfoDTO dto) {
-        return new StarryResponse<>(channelService.changeStreamInfo(dto));
+    @PostMapping("/change-stream-info")
+    public CustomResponse<ResponseStreamInfoDTO> changeStreamInfo(@Valid @RequestBody RequestChangeStreamInfoDTO dto) {
+        return new CustomResponse<>(channelService.changeStreamInfo(dto));
     }
 
-    @GetMapping("/studio/stream-key")
-    public StarryResponse<ResponseStreamKeyDTO> getStreamKey() {
-        return new StarryResponse<>(channelService.getStreamKey());
+    @GetMapping("/stream-key")
+    public CustomResponse<ResponseStreamKeyDTO> getStreamKey() {
+        return new CustomResponse<>(channelService.getStreamKey());
     }
 }

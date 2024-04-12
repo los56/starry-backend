@@ -28,12 +28,6 @@ public class ChatMessageRedisRepositoryImpl implements ChatMessageRedisRepositor
         return redisTemplate.opsForList().range(roomId, 0, count);
     }
 
-//    @Override
-//    public List<ChatMessage> pop(String roomId, Integer count) {
-//        return redisTemplate.opsForList().leftPop(roomId, 50);
-//    }
-
-
     @Override
     public List<ChatMessage> remove(String roomId) {
         List<ChatMessage> messageList = redisTemplate.opsForList().range(roomId, 0, -1);

@@ -9,12 +9,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StarryResponse<T> {
+public class CustomResponse<T> {
     private Integer code;
     private String message;
     private T data;
 
-    public StarryResponse(T data) {
+    public CustomResponse(T data) {
         this(200, null, data);
     }
 }

@@ -1,7 +1,7 @@
 package team.ubox.starry.exception;
 
-public class InvalidTokenException extends StarryException {
+public class InvalidTokenException extends CustomException {
     public InvalidTokenException() {
-        super(StarryError.INVALID_TOKEN);
+        super(CustomError.INVALID_TOKEN);
     }
 }

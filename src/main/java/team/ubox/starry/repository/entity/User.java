@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import team.ubox.starry.types.UserRole;
 import team.ubox.starry.helper.UUIDHelper;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 @Builder
 @AllArgsConstructor
 @Entity(name = "users")
-public class User implements UserDetails {
+public class User implements UserDetails, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;

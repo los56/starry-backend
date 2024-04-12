@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import team.ubox.starry.service.dto.StarryResponse;
+import team.ubox.starry.service.dto.CustomResponse;
 import team.ubox.starry.service.dto.stream.ResponseStreamDTO;
-import team.ubox.starry.exception.StarryError;
-import team.ubox.starry.exception.StarryException;
+import team.ubox.starry.exception.CustomError;
+import team.ubox.starry.exception.CustomException;
 import team.ubox.starry.service.StreamService;
 
 @RestController
@@ -28,7 +28,7 @@ public class StreamController {
     public ResponseEntity<String> onPublish(@RequestBody String body) {
         String key = getKeyFromBody(body);
         if(key == null) {
-            throw new StarryException(StarryError.INVALID_STREAM_KEY);
+            throw new CustomException(CustomError.INVALID_STREAM_KEY);
         }
 
         String streamId = streamService.requestPublish(key);
@@ -46,7 +46,7 @@ public class StreamController {
     public ResponseEntity<Boolean> onPublishDone(@RequestBody String body) {
         String key = getKeyFromBody(body);
         if(key == null) {
-            throw new StarryException(StarryError.INVALID_STREAM_KEY);
+            throw new CustomException(CustomError.INVALID_STREAM_KEY);
         }
         streamService.endPublish(key);
 
@@ -54,8 +54,8 @@ public class StreamController {
     }
 
     @GetMapping("/live")
-    public StarryResponse<ResponseStreamDTO> getSteamDetail(@RequestParam(name="channel") String channelId) {
-        return new StarryResponse<>(streamService.stream(channelId));
+    public CustomResponse<ResponseStreamDTO> getSteamDetail(@RequestParam(name="channel") String channelId) {
+        return new CustomResponse<>(streamService.stream(channelId));
     }
 
     private String getKeyFromBody(String body) {

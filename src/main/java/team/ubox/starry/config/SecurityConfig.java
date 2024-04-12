@@ -55,6 +55,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/stream/**").permitAll()
                                 .requestMatchers("/api/file/image/**").permitAll()
                                 .requestMatchers("/api/file/test").permitAll()
+                                .requestMatchers("/api/chat").permitAll()
                                 .requestMatchers("/*").permitAll()
                                 .anyRequest().authenticated()
                 ).addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);

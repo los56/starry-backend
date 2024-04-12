@@ -1,11 +1,9 @@
 package team.ubox.starry.repository.entity.redis;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Id;
+import lombok.*;
 import org.springframework.data.redis.core.RedisHash;
-import org.springframework.web.socket.WebSocketSession;
+import team.ubox.starry.repository.entity.User;
 
 import java.util.UUID;
 
@@ -13,8 +11,21 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-@RedisHash("chat_session")
+@RedisHash(value = "chat_session")
 public class ChatSession {
-    private UUID owner;
-    private WebSocketSession session;
+    @Id
+    private String id;
+
+    private UUID ownerId;
+    private String nickname;
+
+    private String channelId;
+    private String roomId;
+
+    public void updateOwnerData(UUID ownerId, String nickname) {
+        this.ownerId = ownerId;
+        this.nickname = nickname;
+    }
 }
+
+

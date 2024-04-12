@@ -8,8 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import team.ubox.starry.repository.entity.User;
-import team.ubox.starry.exception.StarryError;
-import team.ubox.starry.exception.StarryException;
+import team.ubox.starry.exception.CustomError;
+import team.ubox.starry.exception.CustomException;
 import team.ubox.starry.repository.UserRepository;
 import team.ubox.starry.security.provider.JwtProvider;
 import team.ubox.starry.service.dto.user.LoginDTO;
@@ -41,9 +41,9 @@ public class UserService {
     public LoginDTO.Response reissue(String refreshToken) {
         String userId = jwtProvider.validateRefreshToken(refreshToken);
         if(userId == null) {
-            throw new StarryException(StarryError.INVALID_TOKEN);
+            throw new CustomException(CustomError.INVALID_TOKEN);
         }
-        User user = userRepository.findById(UUIDHelper.stringToUUID(userId)).orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        User user = userRepository.findById(UUIDHelper.stringToUUID(userId)).orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
         String accessToken = jwtProvider.createAccessToken(user);
 
         return new LoginDTO.Response(accessToken, null);
@@ -66,8 +66,8 @@ public class UserService {
     }
 
     public UserDTO.Response userInfo() {
-        User authUser = AuthHelper.getAuthUser().orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
-        User user = userRepository.findById(authUser.getId()).orElseThrow(() -> new StarryException(StarryError.INVALID_TOKEN));
+        User authUser = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        User user = userRepository.findById(authUser.getId()).orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
 
         return UserDTO.Response.from(user);
     }

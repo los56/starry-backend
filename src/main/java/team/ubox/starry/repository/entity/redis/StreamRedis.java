@@ -18,4 +18,17 @@ public class StreamRedis {
 
     private String streamId;
     private String openTime;
+
+    private Integer viewers;
+
+    public void increaseViewers() {
+        viewers++;
+    }
+
+    public void decreaseViewers() {
+        viewers--;
+        if(viewers < 0) {
+            viewers = 0;
+        }
+    }
 }

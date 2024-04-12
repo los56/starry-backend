@@ -12,8 +12,8 @@ import java.io.*;
 public class ImageProcessor {
     private final String EXT_PNG = "png", EXT_JPG = "jpg";
 
-    public StarryImage createImageFromFile(File target) throws IOException {
-        StarryImage image = new StarryImage();
+    public CustomImage createImageFromFile(File target) throws IOException {
+        CustomImage image = new CustomImage();
 
         String extension = FileHelper.getExtension(target);
         validateExtension(extension);
@@ -34,7 +34,7 @@ public class ImageProcessor {
         }
     }
 
-    public byte[] imageToByteArray(StarryImage image) throws IOException {
+    public byte[] imageToByteArray(CustomImage image) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ImageIO.write(image.getBufferedImage(), image.getExtension(), byteArrayOutputStream);
 
@@ -44,7 +44,7 @@ public class ImageProcessor {
         return imageByteArray;
     }
 
-    public void resizeImage(StarryImage image, Integer width, Integer height) {
+    public void resizeImage(CustomImage image, Integer width, Integer height) {
         BufferedImage originalBufferedImage = image.getBufferedImage();
         width = Math.min(width, originalBufferedImage.getWidth());
         height = Math.min(height, originalBufferedImage.getHeight());

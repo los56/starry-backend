@@ -8,8 +8,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import team.ubox.starry.exception.StarryError;
-import team.ubox.starry.exception.StarryException;
+import team.ubox.starry.exception.CustomError;
+import team.ubox.starry.exception.CustomException;
 
 import java.io.IOException;
 
@@ -21,6 +21,6 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         //response.sendError(HttpServletResponse.SC_FORBIDDEN);
-        handlerExceptionResolver.resolveException(request, response, null, new StarryException(StarryError.FORBIDDEN));
+        handlerExceptionResolver.resolveException(request, response, null, new CustomException(CustomError.FORBIDDEN));
     }
 }
