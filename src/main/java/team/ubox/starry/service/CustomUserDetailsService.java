@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import team.ubox.starry.repository.entity.CustomUserDetail;
 import team.ubox.starry.repository.entity.User;
 import team.ubox.starry.repository.UserRepository;
 
@@ -17,12 +18,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> findUserResult = userRepository.findByUsername(username);
+        User foundUser = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
-        if(findUserResult.isEmpty()) {
-            throw new UsernameNotFoundException("존재하지 않는 사용자: " + username);
-        }
+        CustomUserDetail userDetail = CustomUserDetail.builder()
+                .id(foundUser.getId()).username(foundUser.getUsername()).password(foundUser.getPassword())
+                .userRole(foundUser.getUserRole()).build();
 
-        return findUserResult.get();
+        return userDetail;
     }
 }

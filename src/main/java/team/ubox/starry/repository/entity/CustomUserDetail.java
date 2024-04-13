@@ -18,8 +18,16 @@ import java.util.stream.Collectors;
 public class CustomUserDetail implements UserDetails {
     private UUID id;
     private String username;
+    private String password;
     private String nickname;
     private String userRole;
+
+    public static CustomUserDetail from(User entity) {
+        CustomUserDetail instance = CustomUserDetail.builder().id(entity.getId()).username(entity.getUsername())
+                .password(entity.getPassword()).nickname(entity.getNickname()).userRole(entity.getUserRole()).build();
+
+        return instance;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -27,7 +35,7 @@ public class CustomUserDetail implements UserDetails {
     }
     @Override
     public String getPassword() {
-        return "";
+        return password;
     }
 
     @Override
@@ -37,21 +45,21 @@ public class CustomUserDetail implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

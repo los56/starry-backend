@@ -34,16 +34,17 @@ public class CommunityService {
     private final CommunityReplyRepository communityReplyRepository;
 
     public PostDTO.Response writePost(@Valid PostDTO.RequestWrite dto) {
-        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        User user = userRepository.findById(userDetail.getId()).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_USER));
 
-        CommunityPost post = communityPostRepository.save(CommunityPost.builder().writer(userDetail).title(dto.getTitle())
+        CommunityPost post = communityPostRepository.save(CommunityPost.builder().writer(user).title(dto.getTitle())
                 .content(dto.getContent()).writeDate(Timestamp.from(Instant.now())).build());
 
         return PostDTO.Response.from(post);
     }
 
     public PostDTO.Response editPost(@Valid PostDTO.RequestEdit dto) {
-        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
 
         CommunityPost post = communityPostRepository.findById(dto.getIndex()).orElseThrow(() -> new IllegalStateException("존재하지 않는 글"));
         if(!post.getWriter().getId().equals(userDetail.getId())) {

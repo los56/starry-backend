@@ -45,7 +45,9 @@ public class UserService {
             throw new CustomException(CustomError.INVALID_TOKEN);
         }
         User user = userRepository.findById(UUIDHelper.stringToUUID(userId)).orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
-        String accessToken = jwtProvider.createAccessToken(user);
+        CustomUserDetail userDetail = CustomUserDetail.from(user);
+
+        String accessToken = jwtProvider.createAccessToken(userDetail);
 
         return new LoginDTO.Response(accessToken, null);
     }

@@ -45,7 +45,7 @@ public class ChannelService {
     public ChannelDTO.Response open() {
         CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
 
-        Optional<Channel> findResult = channelRepository.findById(authUser.getId());
+        Optional<Channel> findResult = channelRepository.findById(userDetail.getId());
         if(findResult.isPresent()) {
             throw new CustomException(CustomError.ALREADY_OPENED_CHANNEL);
         }

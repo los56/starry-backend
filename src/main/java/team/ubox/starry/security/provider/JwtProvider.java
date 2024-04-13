@@ -14,6 +14,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import team.ubox.starry.helper.UUIDHelper;
+import team.ubox.starry.repository.entity.CustomUserDetail;
 import team.ubox.starry.service.dto.user.LoginDTO;
 import team.ubox.starry.repository.entity.User;
 
@@ -39,31 +41,31 @@ public class JwtProvider implements InitializingBean {
     }
 
     public LoginDTO.Response createToken(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
 
-        return new LoginDTO.Response(createAccessToken(user), createRefreshToken(user));
+        return new LoginDTO.Response(createAccessToken(userDetail), createRefreshToken(userDetail));
     }
 
-    public String createAccessToken(User user) {
+    public String createAccessToken(CustomUserDetail userDetail) {
         long now = (new Date()).getTime();
 
         Date accessTokenExpireIn = new Date(now + (3600 * 12 * 1000));
 
-        String accessToken = Jwts.builder().subject(user.getUsername())
-                .id(user.getId().toString())
-                .claim("auth", user.getUserRole())
+        String accessToken = Jwts.builder().subject(userDetail.getUsername())
+                .id(userDetail.getId().toString())
+                .claim("auth", userDetail.getUserRole())
                 .expiration(accessTokenExpireIn)
                 .signWith(key).compact();
 
         return accessToken;
     }
 
-    private String createRefreshToken(User user) {
+    private String createRefreshToken(CustomUserDetail user) {
         long now = (new Date()).getTime();
 
         Date refreshTokenExpireIn = new Date(now + (3600 * 24 * 1000 * 7));
         String refreshToken = Jwts.builder()
-                .id(user.getIdString())
+                .id(UUIDHelper.UUIDToString(user.getId()))
                 .expiration(refreshTokenExpireIn)
                 .signWith(key).compact();
 
@@ -77,7 +79,7 @@ public class JwtProvider implements InitializingBean {
         Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("auth").toString().split(","))
                 .map(SimpleGrantedAuthority::new).toList();
 
-        UserDetails user = User.builder()
+        UserDetails user = CustomUserDetail.builder()
                 .id(UUID.fromString(claims.getId()))
                 .username(claims.getSubject())
                 .userRole(claims.get("auth").toString())
