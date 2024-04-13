@@ -24,7 +24,16 @@ public class UserDTO {
                     .nickname(entity.getNickname())
                     .passwordChangeDate(entity.getPasswordChangeDate())
                     .build();
-
         }
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @Builder
+    @AllArgsConstructor
+    public static class RequestChangeInfo {
+        private String username;
+        private String nickname;
     }
 }

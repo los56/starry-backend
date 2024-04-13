@@ -72,6 +72,12 @@ public class UserService {
         return UserDTO.Response.from(user);
     }
 
+    public UserDTO.Response changeUserInfo() {
+
+
+        return null;
+    }
+
     public Boolean checkUsernameDuplicate(String username) {
         Optional<User> result = userRepository.findByUsername(username);
         return result.isPresent();

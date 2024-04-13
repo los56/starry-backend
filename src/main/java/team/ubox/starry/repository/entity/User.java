@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Builder
 @AllArgsConstructor
 @Entity(name = "users")
-public class User implements UserDetails, Serializable {
+public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
@@ -49,40 +49,5 @@ public class User implements UserDetails, Serializable {
 
     public void updateRole(UserRole[] roles) {
         this.userRole = Arrays.stream(roles).map(UserRole::getValue).collect(Collectors.joining(","));
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.stream(userRole.split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 }
