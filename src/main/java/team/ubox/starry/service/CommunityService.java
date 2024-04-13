@@ -6,8 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import team.ubox.starry.exception.CustomError;
+import team.ubox.starry.exception.CustomException;
 import team.ubox.starry.repository.entity.CommunityPost;
 import team.ubox.starry.repository.entity.CommunityReply;
+import team.ubox.starry.repository.entity.CustomUserDetail;
 import team.ubox.starry.repository.entity.User;
 import team.ubox.starry.repository.CommunityPostRepository;
 import team.ubox.starry.repository.CommunityReplyRepository;
@@ -31,19 +34,19 @@ public class CommunityService {
     private final CommunityReplyRepository communityReplyRepository;
 
     public PostDTO.Response writePost(@Valid PostDTO.RequestWrite dto) {
-        User writer = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
 
-        CommunityPost post = communityPostRepository.save(CommunityPost.builder().writer(writer).title(dto.getTitle())
+        CommunityPost post = communityPostRepository.save(CommunityPost.builder().writer(userDetail).title(dto.getTitle())
                 .content(dto.getContent()).writeDate(Timestamp.from(Instant.now())).build());
 
         return PostDTO.Response.from(post);
     }
 
     public PostDTO.Response editPost(@Valid PostDTO.RequestEdit dto) {
-        User writer = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
 
         CommunityPost post = communityPostRepository.findById(dto.getIndex()).orElseThrow(() -> new IllegalStateException("존재하지 않는 글"));
-        if(!post.getWriter().getId().equals(writer.getId())) {
+        if(!post.getWriter().getId().equals(userDetail.getId())) {
             throw new IllegalStateException("권한이 없습니다.");
         }
         post.update(dto.getTitle(), dto.getContent());
@@ -52,9 +55,9 @@ public class CommunityService {
     }
 
     public PostDTO.Response deletePost(Integer index) {
-        User writer = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
 
-        CommunityPost post = communityPostRepository.deleteByIndexAndWriterId(index, writer.getId())
+        CommunityPost post = communityPostRepository.deleteByIndexAndWriterId(index, userDetail.getId())
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 글이거나 권한이 없습니다."));
 
         return PostDTO.Response.from(post);
@@ -85,20 +88,21 @@ public class CommunityService {
     }
 
     public ReplyDTO.Response writeReply(@Valid ReplyDTO.RequestWrite dto) {
-        User authUser = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        User writer = userRepository.findById(userDetail.getId()).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_USER));
 
         CommunityPost post = communityPostRepository.findById(dto.getPostIndex()).orElseThrow(() -> new IllegalStateException("존재하지 않는 글입니다."));
         CommunityReply reply = communityReplyRepository.save(
                 CommunityReply.builder()
                         .post(post)
-                        .writer(authUser)
+                        .writer(writer)
                         .content(dto.getContent())
                         .writeDate(Timestamp.from(Instant.now()))
                         .build());
 
         ReplyDTO.Response responseReplyDTO = new ReplyDTO.Response();
         responseReplyDTO.setPostIndex(post.getIndex());
-        responseReplyDTO.setWriter(authUser.getIdString());
+        responseReplyDTO.setWriter(writer.getIdString());
         responseReplyDTO.setContent(reply.getContent());
         responseReplyDTO.setWriteDate(reply.getWriteDate());
 
@@ -106,13 +110,13 @@ public class CommunityService {
     }
 
     public ReplyDTO.Response deleteReply(Integer index) {
-        User authUser = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
+        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new IllegalStateException("잘못된 사용자입니다."));
 
-        CommunityReply reply = communityReplyRepository.deleteByIndexAndWriterId(index, authUser.getId()).orElseThrow(() -> new IllegalStateException("권한이 없습니다."));
+        CommunityReply reply = communityReplyRepository.deleteByIndexAndWriterId(index, userDetail.getId()).orElseThrow(() -> new IllegalStateException("권한이 없습니다."));
 
         ReplyDTO.Response responseReplyDTO = new ReplyDTO.Response();
         responseReplyDTO.setPostIndex(reply.getPost().getIndex());
-        responseReplyDTO.setWriter(authUser.getIdString());
+        responseReplyDTO.setWriter(UUIDHelper.UUIDToString(userDetail.getId()));
         responseReplyDTO.setContent(reply.getContent());
         responseReplyDTO.setWriteDate(reply.getWriteDate());
 

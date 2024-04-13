@@ -15,6 +15,7 @@ import team.ubox.starry.helper.FileHelper;
 import team.ubox.starry.processor.ImageProcessor;
 import team.ubox.starry.processor.CustomImage;
 import team.ubox.starry.repository.StaticFileRepository;
+import team.ubox.starry.repository.entity.CustomUserDetail;
 import team.ubox.starry.repository.entity.StaticFile;
 import team.ubox.starry.repository.entity.User;
 import team.ubox.starry.service.dto.file.FileDTO;
@@ -37,7 +38,7 @@ public class FileService {
     private String storePath;
 
     public FileDTO.ResponseImage uploadProfileImage(MultipartFile multipartFile) {
-        User user = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
 
         String ip = getIp();
 
@@ -67,7 +68,7 @@ public class FileService {
         StaticFile staticFile = staticFileRepository.save(StaticFile.builder()
                                                                     .fileName(generatedName)
                                                                     .originalFileName(originalFileName)
-                                                                    .uploader(user.getId())
+                                                                    .uploader(userDetail.getId())
                                                                     .uploaderIp(ip)
                                                                     .uploadDate(Timestamp.from(Instant.now()))
                                                                     .build());

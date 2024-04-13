@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import team.ubox.starry.repository.entity.CustomUserDetail;
 import team.ubox.starry.repository.entity.User;
 import team.ubox.starry.exception.CustomError;
 import team.ubox.starry.exception.CustomException;
@@ -66,8 +67,8 @@ public class UserService {
     }
 
     public UserDTO.Response userInfo() {
-        User authUser = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
-        User user = userRepository.findById(authUser.getId()).orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        User user = userRepository.findById(userDetail.getId()).orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
 
         return UserDTO.Response.from(user);
     }
