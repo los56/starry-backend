@@ -8,9 +8,9 @@ import lombok.*;
 @AllArgsConstructor
 public class ChatMessage implements Comparable<ChatMessage>{
     private String roomId;
-    private Writer writer;
+    private Sender sender;
     private String content;
-    private Long writeTime;
+    private Long sendTime;
     private Boolean blinded;
 
     @Override
@@ -18,26 +18,26 @@ public class ChatMessage implements Comparable<ChatMessage>{
         if(!(obj instanceof ChatMessage target)) {
             return false;
         }
-        return this.roomId.equals(target.roomId) && this.writer.equals(target.getWriter()) && this.writeTime.equals(target.getWriteTime());
+        return this.roomId.equals(target.roomId) && this.sender.equals(target.getSender()) && this.sendTime.equals(target.getSendTime());
     }
 
     @Override
     public int compareTo(ChatMessage o) {
-        return writeTime.compareTo(o.getWriteTime());
+        return sendTime.compareTo(o.getSendTime());
     }
 
     @Getter
     @NoArgsConstructor
     @Builder
     @AllArgsConstructor
-    public static class Writer {
+    public static class Sender {
         private String id;
         private String sessionId;
         private String nickname;
 
         @Override
         public boolean equals(Object obj) {
-            if(!(obj instanceof Writer target)) {
+            if(!(obj instanceof Sender target)) {
                 return false;
             }
             return this.id.equals(target.getId()) && this.sessionId.equals(target.getSessionId());

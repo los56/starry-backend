@@ -22,7 +22,7 @@ public class RegisterDTO {
         private String password;
 
         @NotBlank
-        @Length(min = 4, max = 64)
+        @Length(min = 2, max = 64)
         private String nickname;
 
         @NotBlank

@@ -34,8 +34,8 @@ public class ChatMessageRedisRepositoryTest {
         ChatMessage target = null;
 
         for(int i = 0;i < 100;i++) {
-            ChatMessage.Writer writer = new ChatMessage.Writer(UUIDHelper.UUIDToString(UUID.randomUUID()), UUIDHelper.UUIDToString(UUID.randomUUID()), "테스트" + i);
-            ChatMessage message = new ChatMessage(roomId, writer, "메시지 " + i, Instant.now().toEpochMilli(), false);
+            ChatMessage.Sender sender = new ChatMessage.Sender(UUIDHelper.UUIDToString(UUID.randomUUID()), UUIDHelper.UUIDToString(UUID.randomUUID()), "테스트" + i);
+            ChatMessage message = new ChatMessage(roomId, sender, "메시지 " + i, Instant.now().toEpochMilli(), false);
             chatMessageRedisRepository.push(roomId, message);
 
             if(i == 50) {
@@ -44,7 +44,7 @@ public class ChatMessageRedisRepositoryTest {
         }
 
         assert target != null;
-        ChatMessage desireMessage = new ChatMessage(target.getRoomId(), target.getWriter(), target.getContent(), target.getWriteTime(), false);
+        ChatMessage desireMessage = new ChatMessage(target.getRoomId(), target.getSender(), target.getContent(), target.getSendTime(), false);
         long idx = chatMessageRedisRepository.findMessageIndex(roomId, desireMessage).get();
 
         ChatMessage message = chatMessageRedisRepository.getFromIndex(roomId, idx).get();
@@ -67,10 +67,10 @@ public class ChatMessageRedisRepositoryTest {
         String sessionId = UUIDHelper.UUIDToString(UUID.randomUUID());
         long writeTime = Instant.now().toEpochMilli();
 
-        ChatMessage.Writer writer = new ChatMessage.Writer(writerID, sessionId, "닉네임");
+        ChatMessage.Sender sender = new ChatMessage.Sender(writerID, sessionId, "닉네임");
 
-        ChatMessage targetMessage = new ChatMessage(roomId, writer, "콘텐츠", writeTime, false);
-        ChatMessage replacedMessage = new ChatMessage(roomId, writer, "수정된 콘텐츠", writeTime, true);
+        ChatMessage targetMessage = new ChatMessage(roomId, sender, "콘텐츠", writeTime, false);
+        ChatMessage replacedMessage = new ChatMessage(roomId, sender, "수정된 콘텐츠", writeTime, true);
 
         // 더미 데이터 비동기 삽입
         for(int i = 0;i < messageCount;i++) {
@@ -129,14 +129,14 @@ public class ChatMessageRedisRepositoryTest {
         Long endIdx = chatMessageRedisRepository.findMessageIndex(roomId, replacedMessage).get();
         ChatMessage foundEnded = chatMessageRedisRepository.getFromIndex(roomId, endIdx).get();
 
-        System.out.printf("%s - %s - %s%n", foundEnded.getWriter().getId(), foundEnded.getContent(), foundEnded.getWriteTime());
+        System.out.printf("%s - %s - %s%n", foundEnded.getSender().getId(), foundEnded.getContent(), foundEnded.getSendTime());
 
         List<ChatMessage> allMessages = chatMessageRedisRepository.get(roomId, 200).stream().sorted().toList();
         for (ChatMessage message : allMessages) {
-            System.out.printf("%s - %s - %s%n", message.getWriter().getId(), message.getContent(), message.getWriteTime());
+            System.out.printf("%s - %s - %s%n", message.getSender().getId(), message.getContent(), message.getSendTime());
         }
 
-        Assertions.assertEquals(1, allMessages.stream().filter(v -> v.getWriter().getId().equals(writerID)).toArray().length);
+        Assertions.assertEquals(1, allMessages.stream().filter(v -> v.getSender().getId().equals(writerID)).toArray().length);
         Assertions.assertEquals(201, allMessages.size());
     }
 
@@ -144,9 +144,9 @@ public class ChatMessageRedisRepositoryTest {
         String roomId = UUIDHelper.UUIDToString(UUID.randomUUID());
         String writerID = UUIDHelper.UUIDToString(UUID.randomUUID());
         String sessionId = UUIDHelper.UUIDToString(UUID.randomUUID());
-        ChatMessage.Writer writer = new ChatMessage.Writer(writerID, sessionId, "닉네임 " + index);
+        ChatMessage.Sender sender = new ChatMessage.Sender(writerID, sessionId, "닉네임 " + index);
         long writeTime = Instant.now().toEpochMilli();
 
-        return new ChatMessage(roomId, writer, "콘텐츠 " + index, writeTime, false);
+        return new ChatMessage(roomId, sender, "콘텐츠 " + index, writeTime, false);
     }
 }

@@ -9,22 +9,26 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import team.ubox.starry.handler.CustomWebsocketHandler;
+import team.ubox.starry.handler.CustomWebsocketHandshakeHandler;
 
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     private final CustomWebsocketHandler customWebsocketHandler;
+    private final CustomWebsocketHandshakeHandler customWebsocketHandshakeHandler;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/subscribe");
+        registry.enableSimpleBroker("/subscribe", "/prev");
         registry.setApplicationDestinationPrefixes("/send");
+        //registry.setUserDestinationPrefix("/user");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/api/chat").setAllowedOrigins("*");
+        registry.addEndpoint("/api/chat").setHandshakeHandler(customWebsocketHandshakeHandler)
+                .setAllowedOrigins("*");
     }
 
     @Override

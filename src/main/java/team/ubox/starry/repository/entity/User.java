@@ -50,4 +50,17 @@ public class User implements Serializable {
     public void updateRole(UserRole[] roles) {
         this.userRole = Arrays.stream(roles).map(UserRole::getValue).collect(Collectors.joining(","));
     }
+
+    public void updatePassword(String password, Timestamp passwordChangeDate) {
+        this.password = password;
+        this.passwordChangeDate = passwordChangeDate;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImageUrl(String url) {
+        this.profileImageUrl = url;
+    }
 }

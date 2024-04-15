@@ -1,10 +1,12 @@
 package team.ubox.starry.service;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import team.ubox.starry.repository.entity.CustomUserDetail;
@@ -19,6 +21,7 @@ import team.ubox.starry.service.dto.user.UserDTO;
 import team.ubox.starry.helper.AuthHelper;
 import team.ubox.starry.helper.UUIDHelper;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
@@ -70,15 +73,35 @@ public class UserService {
 
     public UserDTO.Response userInfo() {
         CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
-        User user = userRepository.findById(userDetail.getId()).orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        User user = userRepository.findById(userDetail.getId()).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_USER));
 
         return UserDTO.Response.from(user);
     }
 
-    public UserDTO.Response changeUserInfo() {
+    @Transactional
+    public UserDTO.Response changeUserInfo(UserDTO.RequestChangeInfo requestChangeInfo) {
+        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        User user = userRepository.findById(userDetail.getId()).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_USER));
 
+        user.updateNickname(requestChangeInfo.getNickname());
+        user.updateProfileImageUrl(requestChangeInfo.getProfileImageUrl());
 
-        return null;
+        return UserDTO.Response.from(user);
+    }
+
+    @Transactional
+    public UserDTO.Response changePassword(UserDTO.RequestChangePassword requestChangePassword) {
+        CustomUserDetail userDetail = AuthHelper.getAuthUser().orElseThrow(() -> new CustomException(CustomError.INVALID_TOKEN));
+        User user = userRepository.findById(userDetail.getId()).orElseThrow(() -> new CustomException(CustomError.NOT_FOUND_USER));
+
+        boolean isValidPassword = BCrypt.checkpw(requestChangePassword.getCurrentPassword(), user.getPassword());
+        if(!isValidPassword) {
+            throw new CustomException(CustomError.NOT_MATCH_PASSWORD);
+        }
+
+        Timestamp nowTimestamp = Timestamp.from(Instant.now());
+        user.updatePassword(requestChangePassword.getNewPassword(), nowTimestamp);
+        return UserDTO.Response.from(user);
     }
 
     public Boolean checkUsernameDuplicate(String username) {

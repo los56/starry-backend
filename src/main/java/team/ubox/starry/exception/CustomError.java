@@ -21,6 +21,9 @@ public enum CustomError {
     TOO_SHORT_PASSWORD("TOO_SHORT_PASSWORD", "비밀번호가 너무 짧습니다.", 400),
     INVALID_PASSWORD("INVALID_PASSWORD", "사용할 수 없는 비밀번호입니다.", 400),
 
+    // USER INFO
+    NOT_MATCH_PASSWORD("NOT_MATCH_PASSWORD", "기존 비밀번호가 일치하지 않습니다.", 401),
+
     // CHANNEL
     BLANK_CHANNEL_ID("BLANK_CHANNEL_ID", "채널 아이디 값이 비어있습니다.", 400),
     INVALID_CHANNEL_ID("INVALID_CHANNEL_ID", "채널 아이디 형식이 잘못되었습니다.", 400),

@@ -14,7 +14,7 @@ import team.ubox.starry.service.dto.CustomResponse;
 @Aspect
 @Slf4j
 public class ControllerAspect {
-    @Around("execution(* team.ubox.starry.controller.*.*(..))")
+    @Around("execution(* team.ubox.starry.controller.*.*(..)) && !execution(* team.ubox.starry.controller.ChatController.*(..))")
     public Object httpLogging(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         log.info("[Req] From={}, Pathname={}", request.getRemoteAddr(), joinPoint.getSignature().getName());

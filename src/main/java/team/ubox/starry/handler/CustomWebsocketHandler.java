@@ -12,6 +12,7 @@ import team.ubox.starry.service.ChatService;
 import team.ubox.starry.service.dto.chat.ChatDTO;
 
 import java.lang.reflect.Type;
+import java.security.Principal;
 
 @Component
 @RequiredArgsConstructor
@@ -21,16 +22,21 @@ public class CustomWebsocketHandler implements ChannelInterceptor{
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        Principal principal = accessor.getUser();
+        if(principal == null) {
+            return null;
+        }
+
         if(accessor.getCommand() == StompCommand.CONNECT) {
             String channelId = accessor.getFirstNativeHeader("channelId");
             String roomId = accessor.getFirstNativeHeader("roomId");
             String accessToken = accessor.getFirstNativeHeader("accessToken");
 
-            chatService.joinUser(accessor.getSessionId(), new ChatDTO.RequestJoinDTO(channelId, roomId, accessToken));
+            chatService.joinUser(principal, new ChatDTO.RequestJoinDTO(channelId, roomId, accessToken));
         } else if(accessor.getCommand() == StompCommand.DISCONNECT) {
             String receipt = accessor.getFirstNativeHeader("receipt");
             if(receipt == null) {
-                chatService.exitUser(accessor.getSessionId());
+                chatService.exitUser(principal);
             }
         }
         return message;

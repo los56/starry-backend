@@ -25,9 +25,17 @@ public class ChatDTO {
     @Builder
     @AllArgsConstructor
     public static class BroadCastMessage {
+        private String roomId;
         private SenderDTO sender;
         private String content;
         private Long sendTime;
+
+        public static int compare(BroadCastMessage left, BroadCastMessage right) {
+            if(left.sendTime <= right.sendTime) {
+                return -1;
+            }
+            return 1;
+        }
     }
 
     @Getter

@@ -42,6 +42,16 @@ public class UserController {
         return new CustomResponse<>(userService.userInfo());
     }
 
+    @PostMapping("/change-user-info")
+    public CustomResponse<UserDTO.Response> changeUserInfo(@Valid @RequestBody UserDTO.RequestChangeInfo requestChangeInfo) {
+        return new CustomResponse<>(userService.changeUserInfo(requestChangeInfo));
+    }
+
+    @PostMapping("/change-password")
+    public CustomResponse<UserDTO.Response> changePassword(@Valid @RequestBody UserDTO.RequestChangePassword requestChangePassword) {
+        return new CustomResponse<>(userService.changePassword(requestChangePassword));
+    }
+
     @GetMapping("/duplicate")
     public CustomResponse<Boolean> checkDuplicate(@RequestParam String method, @RequestParam String data) {
         Boolean result;
